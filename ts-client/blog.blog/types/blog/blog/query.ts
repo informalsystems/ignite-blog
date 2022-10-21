@@ -1,6 +1,8 @@
 /* eslint-disable */
 import _m0 from "protobufjs/minimal";
+import { PageRequest, PageResponse } from "../../cosmos/base/query/v1beta1/pagination";
 import { Params } from "./params";
+import { Post } from "./post";
 
 export const protobufPackage = "blog.blog";
 
@@ -15,11 +17,15 @@ export interface QueryParamsResponse {
 }
 
 export interface QueryPostsRequest {
+  /** Adding pagination to request */
+  pagination: PageRequest | undefined;
 }
 
 export interface QueryPostsResponse {
-  title: string;
-  body: string;
+  /** Returning a list of posts */
+  Post: Post[];
+  /** Adding pagination to response */
+  pagination: PageResponse | undefined;
 }
 
 function createBaseQueryParamsRequest(): QueryParamsRequest {
@@ -111,11 +117,14 @@ export const QueryParamsResponse = {
 };
 
 function createBaseQueryPostsRequest(): QueryPostsRequest {
-  return {};
+  return { pagination: undefined };
 }
 
 export const QueryPostsRequest = {
-  encode(_: QueryPostsRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+  encode(message: QueryPostsRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.pagination !== undefined) {
+      PageRequest.encode(message.pagination, writer.uint32(10).fork()).ldelim();
+    }
     return writer;
   },
 
@@ -126,6 +135,9 @@ export const QueryPostsRequest = {
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
+        case 1:
+          message.pagination = PageRequest.decode(reader, reader.uint32());
+          break;
         default:
           reader.skipType(tag & 7);
           break;
@@ -134,32 +146,37 @@ export const QueryPostsRequest = {
     return message;
   },
 
-  fromJSON(_: any): QueryPostsRequest {
-    return {};
+  fromJSON(object: any): QueryPostsRequest {
+    return { pagination: isSet(object.pagination) ? PageRequest.fromJSON(object.pagination) : undefined };
   },
 
-  toJSON(_: QueryPostsRequest): unknown {
+  toJSON(message: QueryPostsRequest): unknown {
     const obj: any = {};
+    message.pagination !== undefined
+      && (obj.pagination = message.pagination ? PageRequest.toJSON(message.pagination) : undefined);
     return obj;
   },
 
-  fromPartial<I extends Exact<DeepPartial<QueryPostsRequest>, I>>(_: I): QueryPostsRequest {
+  fromPartial<I extends Exact<DeepPartial<QueryPostsRequest>, I>>(object: I): QueryPostsRequest {
     const message = createBaseQueryPostsRequest();
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PageRequest.fromPartial(object.pagination)
+      : undefined;
     return message;
   },
 };
 
 function createBaseQueryPostsResponse(): QueryPostsResponse {
-  return { title: "", body: "" };
+  return { Post: [], pagination: undefined };
 }
 
 export const QueryPostsResponse = {
   encode(message: QueryPostsResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
-    if (message.title !== "") {
-      writer.uint32(10).string(message.title);
+    for (const v of message.Post) {
+      Post.encode(v!, writer.uint32(10).fork()).ldelim();
     }
-    if (message.body !== "") {
-      writer.uint32(18).string(message.body);
+    if (message.pagination !== undefined) {
+      PageResponse.encode(message.pagination, writer.uint32(18).fork()).ldelim();
     }
     return writer;
   },
@@ -172,10 +189,10 @@ export const QueryPostsResponse = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          message.title = reader.string();
+          message.Post.push(Post.decode(reader, reader.uint32()));
           break;
         case 2:
-          message.body = reader.string();
+          message.pagination = PageResponse.decode(reader, reader.uint32());
           break;
         default:
           reader.skipType(tag & 7);
@@ -187,22 +204,29 @@ export const QueryPostsResponse = {
 
   fromJSON(object: any): QueryPostsResponse {
     return {
-      title: isSet(object.title) ? String(object.title) : "",
-      body: isSet(object.body) ? String(object.body) : "",
+      Post: Array.isArray(object?.Post) ? object.Post.map((e: any) => Post.fromJSON(e)) : [],
+      pagination: isSet(object.pagination) ? PageResponse.fromJSON(object.pagination) : undefined,
     };
   },
 
   toJSON(message: QueryPostsResponse): unknown {
     const obj: any = {};
-    message.title !== undefined && (obj.title = message.title);
-    message.body !== undefined && (obj.body = message.body);
+    if (message.Post) {
+      obj.Post = message.Post.map((e) => e ? Post.toJSON(e) : undefined);
+    } else {
+      obj.Post = [];
+    }
+    message.pagination !== undefined
+      && (obj.pagination = message.pagination ? PageResponse.toJSON(message.pagination) : undefined);
     return obj;
   },
 
   fromPartial<I extends Exact<DeepPartial<QueryPostsResponse>, I>>(object: I): QueryPostsResponse {
     const message = createBaseQueryPostsResponse();
-    message.title = object.title ?? "";
-    message.body = object.body ?? "";
+    message.Post = object.Post?.map((e) => Post.fromPartial(e)) || [];
+    message.pagination = (object.pagination !== undefined && object.pagination !== null)
+      ? PageResponse.fromPartial(object.pagination)
+      : undefined;
     return message;
   },
 };

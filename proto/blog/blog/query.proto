@@ -5,7 +5,7 @@ import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "cosmos/base/query/v1beta1/pagination.proto";
 import "blog/blog/params.proto";
-import "blog/post.proto";
+import "blog/blog/post.proto";
 // this line is used by starport scaffolding # 1
 
 option go_package = "blog/x/blog/types";
