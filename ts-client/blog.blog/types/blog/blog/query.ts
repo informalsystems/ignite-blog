@@ -14,6 +14,14 @@ export interface QueryParamsResponse {
   params: Params | undefined;
 }
 
+export interface QueryPostsRequest {
+}
+
+export interface QueryPostsResponse {
+  title: string;
+  body: string;
+}
+
 function createBaseQueryParamsRequest(): QueryParamsRequest {
   return {};
 }
@@ -102,10 +110,109 @@ export const QueryParamsResponse = {
   },
 };
 
+function createBaseQueryPostsRequest(): QueryPostsRequest {
+  return {};
+}
+
+export const QueryPostsRequest = {
+  encode(_: QueryPostsRequest, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryPostsRequest {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryPostsRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(_: any): QueryPostsRequest {
+    return {};
+  },
+
+  toJSON(_: QueryPostsRequest): unknown {
+    const obj: any = {};
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryPostsRequest>, I>>(_: I): QueryPostsRequest {
+    const message = createBaseQueryPostsRequest();
+    return message;
+  },
+};
+
+function createBaseQueryPostsResponse(): QueryPostsResponse {
+  return { title: "", body: "" };
+}
+
+export const QueryPostsResponse = {
+  encode(message: QueryPostsResponse, writer: _m0.Writer = _m0.Writer.create()): _m0.Writer {
+    if (message.title !== "") {
+      writer.uint32(10).string(message.title);
+    }
+    if (message.body !== "") {
+      writer.uint32(18).string(message.body);
+    }
+    return writer;
+  },
+
+  decode(input: _m0.Reader | Uint8Array, length?: number): QueryPostsResponse {
+    const reader = input instanceof _m0.Reader ? input : new _m0.Reader(input);
+    let end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseQueryPostsResponse();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1:
+          message.title = reader.string();
+          break;
+        case 2:
+          message.body = reader.string();
+          break;
+        default:
+          reader.skipType(tag & 7);
+          break;
+      }
+    }
+    return message;
+  },
+
+  fromJSON(object: any): QueryPostsResponse {
+    return {
+      title: isSet(object.title) ? String(object.title) : "",
+      body: isSet(object.body) ? String(object.body) : "",
+    };
+  },
+
+  toJSON(message: QueryPostsResponse): unknown {
+    const obj: any = {};
+    message.title !== undefined && (obj.title = message.title);
+    message.body !== undefined && (obj.body = message.body);
+    return obj;
+  },
+
+  fromPartial<I extends Exact<DeepPartial<QueryPostsResponse>, I>>(object: I): QueryPostsResponse {
+    const message = createBaseQueryPostsResponse();
+    message.title = object.title ?? "";
+    message.body = object.body ?? "";
+    return message;
+  },
+};
+
 /** Query defines the gRPC querier service. */
 export interface Query {
   /** Parameters queries the parameters of the module. */
   Params(request: QueryParamsRequest): Promise<QueryParamsResponse>;
+  /** Queries a list of Posts items. */
+  Posts(request: QueryPostsRequest): Promise<QueryPostsResponse>;
 }
 
 export class QueryClientImpl implements Query {
@@ -113,11 +220,18 @@ export class QueryClientImpl implements Query {
   constructor(rpc: Rpc) {
     this.rpc = rpc;
     this.Params = this.Params.bind(this);
+    this.Posts = this.Posts.bind(this);
   }
   Params(request: QueryParamsRequest): Promise<QueryParamsResponse> {
     const data = QueryParamsRequest.encode(request).finish();
     const promise = this.rpc.request("blog.blog.Query", "Params", data);
     return promise.then((data) => QueryParamsResponse.decode(new _m0.Reader(data)));
+  }
+
+  Posts(request: QueryPostsRequest): Promise<QueryPostsResponse> {
+    const data = QueryPostsRequest.encode(request).finish();
+    const promise = this.rpc.request("blog.blog.Query", "Posts", data);
+    return promise.then((data) => QueryPostsResponse.decode(new _m0.Reader(data)));
   }
 }
 
